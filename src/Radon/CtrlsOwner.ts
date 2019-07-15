@@ -1,4 +1,6 @@
 import {CtrlBase} from "./CtrlBase";
+import {IDescrCtrl} from "./descr/IDescrCtrl";
+import {FormBase} from "./FormBase";
 import {IStream} from "./types";
 /**
  * Контейнер контроллеров.
@@ -18,5 +20,17 @@ export class CtrlsOwner {
             ctrl.save(resultStream, bConvert);
             return resultStream;
         }, stream || {});
+    }
+    public reset(): void {
+        this.ctrls.forEach((ctrl) => ctrl.reset());
+    }
+    protected createCtrls(descrList: IDescrCtrl[] | null, form: FormBase) {
+        if (descrList) {
+            descrList.forEach((descr) => this.ctrls.push(CtrlBase.createInstance({
+                descr,
+                form,
+                owner: this,
+            })));
+        }
     }
 }

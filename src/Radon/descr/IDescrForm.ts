@@ -1,4 +1,4 @@
-import {IDescrCtrl} from "./descr/IDescrCtrl";
+import {IDescrCtrl} from "./IDescrCtrl";
 /**
  * JSON-структура, описывающая метаданные формы
  * Created by PeterWin on 07.07.2019.
@@ -6,5 +6,8 @@ import {IDescrCtrl} from "./descr/IDescrCtrl";
 
 export interface IDescrForm {
     name: string;
+    type?: TypeForm; // by default = FormBase
     ctrls: IDescrCtrl[];
 }
+
+export type TypeForm = string;

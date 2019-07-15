@@ -1,5 +1,6 @@
 import {CtrlBase} from "../CtrlBase";
 import {Field, IStream, TValue} from "../types";
+import {CvtBase} from '../converter/CvtBase';
 /**
  * Контроллер, который обрабатывает одно простое значение типа TValue
  * Наиболее типичные наследники: CtrlString, CtrlBool, CtrlDropList
@@ -8,13 +9,21 @@ import {Field, IStream, TValue} from "../types";
  */
 
 export class CtrlValue extends CtrlBase {
-    public load(stream: IStream, bConvert?: boolean): void {
-        const value: TValue = (stream[this.name]) as TValue;
-        this.setValue(value);
+    public load(rawStream: IStream, bConvert?: boolean): void {
+        const stream = bConvert ? CvtBase.readList(this.converters, rawStream) : rawStream;
+        if (this.name in stream) {
+            const value: TValue = (stream[this.name]) as TValue;
+            this.setValue(value);
+        }
     }
-
     public save(stream: IStream, bConvert?: boolean): void {
         stream[this.name] = this.getValue();
+        if (bConvert) {
+            CvtBase.writeList(this.converters, stream);
+        }
+    }
+    public reset(): void {
+        this.setValue(this.getDefaultValue());
     }
 
     public getValue(): TValue {
@@ -22,5 +31,21 @@ export class CtrlValue extends CtrlBase {
     }
     public setValue(value: TValue): boolean {
         return this.set(Field.value, value);
+    }
+
+    protected getDefaultValue(): TValue {
+        return this.get(Field.default, this.defaultClassValue());
+    }
+    protected defaultClassValue(): TValue {
+        return "";
+    }
+
+    /**
+     * Эта функция вызывается при изменении данных на форме пользователем, когда он, например, вводит текст.
+     * Принципиальное отличие от setValue в том, что подобные действия могут учитываться для undo/redo.
+     * @param {TValue} value
+     */
+    protected onChangeValue(value: TValue, eventType: string = "") {
+        this.setValue(value);
     }
 }

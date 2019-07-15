@@ -3,8 +3,9 @@
  */
 import * as React from "react";
 import {FormBase} from  "./FormBase";
-import {IDescrForm} from "./IDescrForm";
-import {IStream} from "./types";
+import {IDescrForm} from "./descr/IDescrForm";
+import {Field, IStream} from './types';
+import {RnCtrlShell} from './RnCtrlShell';
 
 export interface IPropsRnForm {
     descr: IDescrForm;
@@ -12,27 +13,70 @@ export interface IPropsRnForm {
     getManager?: (manager: FormBase) => void;
 }
 
-export class RnForm extends React.Component<IPropsRnForm, {}> {
-    private manager: FormBase;
+interface IStateRnForm {
+    status: "Ready" | "Wait" | "Error";
+    manager: FormBase;
+}
+
+export class RnForm extends React.Component<IPropsRnForm, IStateRnForm> {
 
     public constructor(props: IPropsRnForm) {
         super(props);
-        this.manager = FormBase.createInstance(props.descr);
+        this.state = {status: "Ready", manager: this.createManager()};
+    }
+    private createManager() {
+        const {props} = this;
+        const manager: FormBase = FormBase.createInstance(props.descr);
         if (props.data) {
-            this.manager.load(props.data, true);
+            manager.reset(); // Установить для всех контроллеров дефолтные значения
+            manager.load(props.data, true);
         }
-        if (props.getManager) {
-            props.getManager(this.manager);
+        if (this.props.getManager) {
+            this.props.getManager(manager);
+        }
+        return manager;
+    }
+
+    componentWillReceiveProps(nextProps: IPropsRnForm) {
+        const {manager} = this.state;
+        if (this.props.data !== nextProps.data) {
+            this.setState({status: 'Wait'});
+            // Если для компонента изменились данные, то загрузить новые данные в контроллер формы
+            // Это случается, если одну форму показывать несколько раз. Например, в модальном окне.
+            manager.unlock(true);  // Принудительно разлочить форму
+            manager.reset();
+            manager.load(nextProps.data);
+        } else if (this.props.descr !== nextProps.descr) {
+            this.setState({manager: this.createManager()});
         }
     }
 
+    private onSubmit = (event: React.ChangeEvent<HTMLFormElement>) => {
+        let needNativeSubmit: boolean = false;
+        try {
+            needNativeSubmit = this.state.manager.onSubmit();
+        } catch(e) {
+            needNativeSubmit = false;
+        }
+        if (!needNativeSubmit) {
+            event.preventDefault();
+        }
+    };
+
+    private onReset = (event: React.ChangeEvent<HTMLFormElement>) => {
+        try {
+            this.state.manager.onReset();
+        } catch(e) {
+            console.error(e);
+        }
+        event.preventDefault();
+    };
+
     public render() {
-        const {descr} = this.props;
         return (
-            <div>
-                This is form <b>{descr.name}</b>
-                <pre>{JSON.stringify(descr, null, "  ")}</pre>
-            </div>
+            <form name={this.state.manager.name} onSubmit={this.onSubmit} onReset={this.onReset}>
+                {this.state.manager.ctrls.map((ctrl) => (<RnCtrlShell key={ctrl.getKey()} ctrl={ctrl} />))}
+            </form>
         );
     }
 }
