@@ -43,9 +43,16 @@ export class RnCtrlShell extends React.Component<IPropsRnCtrlShell, IDescrCtrl> 
         const ctrlList: CtrlBase[] = ctrl.ctrls;
         return (<this.component
             {...this.state}
+            errMsg={ctrl.getErrorMessage()}
             ctrlList={ctrlList}
             {...ctrl.getPropsMap()}
         />);
+    }
+    render2() {
+        const {ctrl} = this.props;
+        return <div>
+            Ctrl {ctrl.name}: {ctrl.get('label')}, slaves={ctrl.ctrls.length}
+        </div>;
     }
 }
 /*

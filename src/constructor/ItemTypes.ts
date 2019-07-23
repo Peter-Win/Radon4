@@ -1,0 +1,1 @@
+export const ItemTypes = {NewUC: "NewUC", CARD: "card"};

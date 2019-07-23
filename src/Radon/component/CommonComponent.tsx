@@ -10,6 +10,8 @@ export interface IPropsCommonComponent {
     ctrlList: CtrlBase[];
     disabled?: boolean;
     hidden?: boolean;
+    cssClass?: string;
+    errMsg: string;
 }
 
 export const CommonComponent: React.FC<IPropsCommonComponent> = (props) => (

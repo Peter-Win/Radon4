@@ -1,0 +1,65 @@
+.con-frame {
+    display: flex;
+}
+.con-palette-box {
+    flex: 1;
+    background-color: #999999;
+    border: thin solid black;
+    min-height: 100px;
+}
+.con-board-box {
+    flex: 1;
+    border: thin solid black;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+}
+.con-board-old {
+    background-color: #999999;
+}
+.con-board-visual {
+    background-color: #AAFFEE;
+}
+
+.con-dummy {
+    margin: .5em;
+    border: thin solid black;
+    padding: .2em .6em;
+    background-color: azure;
+    color: black;
+    cursor: pointer;
+    min-height: 1.5em;
+}
+.con-dummy.con-dummy-current {
+    background-color: #33acfe;
+}
+.con-dummy.con-dummy-error {
+    border: thick solid red;
+}
+
+.con-props-box {
+    flex: 1;
+    border: thin solid black;
+}
+
+.con-preview-box {
+    flex: 1;
+    border: thin solid black;
+    background-color: #FFE;
+}
+
+.invalid {
+    background-color: #FAA;
+}
+
+/* Специальный элемент для перетаскивания */
+.con-drag-handler {
+    display: inline-block;
+    width: 1em;
+    height: 2em;
+    background-color: green;
+    cursor: copy;
+}
+.con-drag-right {
+    display: inline-block;
+}

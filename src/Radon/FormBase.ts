@@ -1,15 +1,16 @@
-import {CtrlsOwner} from './CtrlsOwner';
-import {IDescrForm} from './descr/IDescrForm';
-import {Rn} from './Rn';
-import {Field, IStream} from './types';
-import {IVisitor, VisitorResult} from './Visitor';
-import {CtrlBase} from './CtrlBase';
+import {CtrlBase} from "./CtrlBase";
+import {CtrlsOwner} from "./CtrlsOwner";
+import {IDescrForm} from "./descr/IDescrForm";
+import {Rn} from "./Rn";
+import {Field, IStream} from "./types";
+import {IVisitor, VisitorResult} from "./Visitor";
+import {IDescrError} from './descr/IDescrError';
 
 export interface IDictForms {
     [key: string]: typeof FormBase;
 }
 
-export type TFormEventType = 'update' | 'submit' | 'reset';
+export type TFormEventType = "update" | "submit" | "reset";
 
 export interface IFormEvent {
     type: TFormEventType;
@@ -25,25 +26,31 @@ export type TFormEventListener = (event: IFormEvent) => void;
  * Created by PeterWin on 07.07.2019.
  */
 export class FormBase extends CtrlsOwner {
+
+    public get name(): string {
+        return this.descr.name;
+    }
     public static createInstance(descr: IDescrForm): FormBase {
-        const {type = 'Base'} = descr;
+        const {type = "Base"} = descr;
         const Constructor = Rn.dict.forms[type];
         const form: FormBase = new Constructor(descr);
         form.createCtrls(descr.ctrls, form);
         return form;
     }
-
-    protected readonly descr: IDescrForm;
-    private lockCounter: number = 0;
     public bDead: boolean = false;
+
+    public readonly descr: IDescrForm;
+    private lockCounter: number = 0;
+
+    private updateCounter: number = 0;
+    private queueSize: number = 0;
+
+    private subscribers: Map<TFormEventType, Set<TFormEventListener>> = new Map();
+    private errors: IDescrError[] = [];
 
     protected constructor(descr: IDescrForm) {
         super();
         this.descr = descr;
-    }
-
-    public get name(): string {
-        return this.descr.name;
     }
 
     public load(stream: IStream, bConvert?: boolean): void {
@@ -73,62 +80,19 @@ export class FormBase extends CtrlsOwner {
         return result || (formEnd && formEnd(this));
     }
 
-    private updateCounter: number = 0;
-    private queueSize: number = 0;
-
     public update(): void {
         if (this.bDead) {
-            console.log('Call update for dead form!!!');
+            console.log("Call update for dead form!!!");
             return;
         }
         if (this.queueSize === 10) {
-            console.log('Проблемный вызов FormBase.update');
+            console.log("Проблемный вызов FormBase.update");
         }
 
         if (!this.updateCounter) {
             setTimeout(() => this.forceUpdate(), 1);
         }
         this.updateCounter += 1;
-    }
-
-    private forceUpdate(): void {
-        if (this.queueSize > 10) {
-            console.warn('Достигнут предел вложенности FormBase.forceUpdate');
-            this.queueSize = 0;
-            return;
-        }
-        this.updateCounter = 0;
-        // Сначала вызвать onUpdate для всех контроллеров
-        this.walk({
-            ctrlBegin: (ctrl: CtrlBase) => {
-                ctrl.onUpdate();
-                // Если у контроллера есть условие видимости
-                const conditionVisible = ctrl.get(Field.visibleIf);
-                if (conditionVisible) {
-                    const conditionVisibleValue = this.calcExpr(conditionVisible, ctrl);
-                    ctrl.show(!!conditionVisibleValue);
-                }
-                const conditionDisabled = ctrl.get(Field.disabledIf);
-                if (conditionDisabled) {
-                    ctrl.enable(!this.calcExpr(conditionDisabled, ctrl));
-                }
-            }
-        });
-        this.onUpdate();
-        // Вызов postUpdate, главной целью которого является отображение информации об ошибках
-        this.walk({
-            ctrlEnd: ctrl => ctrl.postUpdate(),
-        });
-        this.postUpdate();
-
-        this.walk({
-            ctrlEnd: (ctrl: CtrlBase) => {
-                ctrl.visualUpdate();
-            },
-        });
-        this.onEvent({
-            type: 'update',
-        });
     }
 
     public onUpdate() {
@@ -158,17 +122,6 @@ export class FormBase extends CtrlsOwner {
         }
     }
 
-    protected onEvent(event: IFormEvent) {
-        const part = this.subscribers.get(event.type);
-        if (part) {
-            Array.from(part).forEach((listener: TFormEventListener) => {
-                listener(event);
-            })
-        }
-    }
-
-    private subscribers: Map<TFormEventType, Set<TFormEventListener>> = new Map();
-
     public lock(step: number = 1) {
         this.lockCounter += step;
         this.walk({
@@ -182,18 +135,18 @@ export class FormBase extends CtrlsOwner {
 
     public onSubmit(): boolean {
         this.onEvent({
-            type: 'submit',
+            type: "submit",
         });
         return false;
     }
 
     public onReset(): boolean {
-        console.log('FormBase.onReset');
+        console.log("FormBase.onReset");
         this.walk({
             ctrlBegin: (ctrl) => ctrl.reset(),
         });
         this.onEvent({
-            type: 'reset',
+            type: "reset",
         });
         return false;
     }
@@ -206,6 +159,15 @@ export class FormBase extends CtrlsOwner {
         return result ? result as CtrlBase : null;
     }
 
+    protected onEvent(event: IFormEvent) {
+        const part = this.subscribers.get(event.type);
+        if (part) {
+            Array.from(part).forEach((listener: TFormEventListener) => {
+                listener(event);
+            });
+        }
+    }
+
     protected calcExpr(expr: string | TExpressionFunc, source: CtrlBase): any {
         if (typeof expr === "function") {
             return expr(source);
@@ -213,7 +175,7 @@ export class FormBase extends CtrlsOwner {
         // Пока очень простой вариант
         let sExpr: string = expr;
         let bInverse = false;
-        if (sExpr[0] === '!') {
+        if (sExpr[0] === "!") {
             bInverse = true;
             sExpr = sExpr.slice(1);
         }
@@ -227,6 +189,71 @@ export class FormBase extends CtrlsOwner {
             result = !result;
         }
         return result;
+    }
+
+    public forceUpdate(): void {
+        if (this.queueSize > 10) {
+            console.warn("Достигнут предел вложенности FormBase.forceUpdate");
+            this.queueSize = 0;
+            return;
+        }
+        this.updateCounter = 0;
+        this.errors.length = 0;
+        // Сначала вызвать onUpdate для всех контроллеров
+        this.walk({
+            ctrlBegin: (ctrl: CtrlBase) => {
+                ctrl.onUpdate();
+                // Если у контроллера есть условие видимости
+                const conditionVisible = ctrl.get(Field.visibleIf);
+                if (conditionVisible) {
+                    const conditionVisibleValue = this.calcExpr(conditionVisible, ctrl);
+                    ctrl.show(!!conditionVisibleValue);
+                }
+                const conditionDisabled = ctrl.get(Field.disabledIf);
+                if (conditionDisabled) {
+                    ctrl.enable(!this.calcExpr(conditionDisabled, ctrl));
+                }
+            },
+        });
+        this.onUpdate();
+        const wrongs: Set<CtrlBase> = new Set();
+        // Теперь проверка ошибок
+        this.walk({
+            ctrlBegin: (ctrl) => {
+                if (ctrl.getErrorMessage()) {
+                    wrongs.add(ctrl);
+                }
+                if (ctrl.isVisible()) {
+                    ctrl.check(this.errors);
+                }
+            },
+        });
+        // Теперь передать полученные ошибки их владельцам
+        this.errors.reverse().forEach((err: IDescrError) => {
+            const ctrl: CtrlBase = err.owner;
+            if (ctrl) {
+                ctrl.setError(err);
+                wrongs.delete(ctrl);
+            }
+        });
+        Array.from(wrongs).forEach((ctrl) => ctrl.clearError());
+        // Вызов postUpdate, главной целью которого является отображение информации об ошибках
+        this.walk({
+            ctrlEnd: (ctrl) => ctrl.postUpdate(),
+        });
+        this.postUpdate();
+
+        this.walk({
+            ctrlEnd: (ctrl: CtrlBase) => {
+                ctrl.visualUpdate();
+            },
+        });
+        this.onEvent({
+            type: "update",
+        });
+    }
+    public getErrors(): IDescrError[] {
+        return this.errors;
     }
 }
 

@@ -1,5 +1,5 @@
-import {CvtBase} from './CvtBase';
-import {IStream} from '../types';
+import {IStream} from "../types";
+import {CvtBase} from "./CvtBase";
 
 export class CvtNumber extends CvtBase {
     public write(stream: IStream): void {

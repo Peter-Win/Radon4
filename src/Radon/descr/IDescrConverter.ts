@@ -3,4 +3,3 @@ export interface IDescrConverter {
     type: TypeConverter;
     [field: string]: any;
 }
-

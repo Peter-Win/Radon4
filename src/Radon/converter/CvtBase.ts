@@ -5,11 +5,11 @@
  * Обработка происходит на уровне потока, а не отдельных значений.
  * Потому что контроллер может оперировать произвольным числом значений.
  */
-import {IStream} from '../types';
-import {CtrlBase} from '../CtrlBase';
-import {IDescrConverter} from '../descr/IDescrConverter';
-import {Rn} from '../Rn';
-import {TDescrConverterExt} from '../descr/IDescrCtrl';
+import {CtrlBase} from "../CtrlBase";
+import {IDescrConverter} from "../descr/IDescrConverter";
+import {expandConverterExt, TDescrConverterExt} from "../descr/IDescrCtrl";
+import {Rn} from "../Rn";
+import {IStream} from "../types";
 
 export interface IDictConverters {
     [key: string]: typeof CvtBase;
@@ -17,12 +17,7 @@ export interface IDictConverters {
 
 export class CvtBase {
     public static createInstance(descrExt: TDescrConverterExt, ctrl: CtrlBase): CvtBase {
-        let descr;
-        if (typeof descrExt === 'string') {
-            descr = {type: descrExt};
-        } else {
-            descr = descrExt
-        }
+        const descr: IDescrConverter = expandConverterExt(descrExt);
         const Constructor = Rn.dict.converters[descr.type];
         const converter: CvtBase = new Constructor(descr, ctrl);
         return converter;

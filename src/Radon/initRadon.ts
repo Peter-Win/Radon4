@@ -1,39 +1,57 @@
 /**
  * Created by PeterWin on 07.07.2019.
  */
+import {CheckBox} from "./component/CheckBox";
+import {ResetStd} from "./component/ResetStd";
+import {StringStd} from "./component/StringStd";
+import {SubmitStd} from "./component/SubmitStd";
+import {TextArea} from "./component/TextArea";
+import {CvtNumber} from "./converter/CvtNumber";
+import {CtrlBoolean} from "./ctrl/CtrlBoolean";
+import {CtrlInteger} from "./ctrl/CtrlInteger";
+import {CtrlReset} from "./ctrl/CtrlReset";
 import {CtrlString} from "./ctrl/CtrlString";
-import {CvtNumber} from './converter/CvtNumber';
+import {CtrlSubmit} from "./ctrl/CtrlSubmit";
 import {FormBase} from "./FormBase";
 import {Rn} from "./Rn";
-import {StringStd} from './component/StringStd';
-import {SubmitStd} from './component/SubmitStd';
-import {TextArea} from './component/TextArea';
-import {CtrlSubmit} from './ctrl/CtrlSubmit';
-import {CheckBox} from './component/CheckBox';
-import {CtrlBoolean} from './ctrl/CtrlBoolean';
-import {ResetStd} from './component/ResetStd';
-import {CtrlReset} from './ctrl/CtrlReset';
+import {BlockStd} from './component/BlockStd';
+import {CtrlBlock} from './ctrl/CtrlBlock';
+import {SliderStd} from './component/SliderStd';
+import {CtrlRange} from './ctrl/CtrlRange';
+import {ValidatorNonEmpty} from './validator/ValidatorNonEmpty';
+import {CvtExcludeEmpty} from './converter/CvtExcludeEmpty';
+import {ValidatorRegExp} from './validator/ValidatorRegExp';
 
 export const initRadon = () => {
     Rn.reg({
         converters: {
+            ExcludeEmpty: CvtExcludeEmpty,
             Number: CvtNumber,
         },
         components: {
+            BlockStd,
             CheckBox,
             ResetStd,
+            SliderStd,
             StringStd,
             SubmitStd,
             TextArea,
         },
         ctrls: {
+            Block: CtrlBlock,
             Boolean: CtrlBoolean,
+            Integer: CtrlInteger,
+            Range: CtrlRange,
             Reset: CtrlReset,
             String: CtrlString,
             Submit: CtrlSubmit,
         },
         forms: {
             Base: FormBase,
+        },
+        validators: {
+            NonEmpty: ValidatorNonEmpty,
+            RegExp: ValidatorRegExp,
         },
     });
 };

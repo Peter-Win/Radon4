@@ -11,7 +11,7 @@ export interface IPropsTextArea extends IPropsCommonComponent {
 }
 
 export const TextArea: React.FC<IPropsTextArea> = (props) => (
-    <FieldStd label={props.label} tooltip={props.tooltip}>
+    <FieldStd {...props}>
         <StringBox onChange={props.onChange} value={props.value}>
         <textarea
             name={props.name}

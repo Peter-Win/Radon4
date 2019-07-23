@@ -2,9 +2,9 @@
  * Контроллер булевской величины.
  * Типичный вариант отображения - чекбокс.
  */
-import {CtrlValue} from './CtrlValue';
-import {TypeComponent} from '../descr/IDescrCtrl';
-import {TValue} from '../types';
+import {TypeComponent} from "../descr/IDescrCtrl";
+import {TValue} from "../types";
+import {CtrlValue} from "./CtrlValue";
 
 export class CtrlBoolean extends CtrlValue {
     protected getDefaultComponent(): TypeComponent {
@@ -17,6 +17,6 @@ export class CtrlBoolean extends CtrlValue {
         super.onInit();
         this.propsMap.onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             this.onChangeValue(event.target.checked, event.type);
-        }
+        };
     }
 }

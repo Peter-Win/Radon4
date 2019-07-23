@@ -10,6 +10,7 @@ const formDescr = {
             label: 'First name',
             name: 'firstName',
             type: 'String',
+            validators: ["NonEmpty"],
         },
         {
             label: 'Last name',

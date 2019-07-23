@@ -8,6 +8,7 @@ export interface IDescrForm {
     name: string;
     type?: TypeForm; // by default = FormBase
     ctrls: IDescrCtrl[];
+    [field: string]: any;
 }
 
 export type TypeForm = string;

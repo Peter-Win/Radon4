@@ -8,7 +8,7 @@ import {Field, IStream} from './types';
 import {RnCtrlShell} from './RnCtrlShell';
 
 export interface IPropsRnForm {
-    descr: IDescrForm;
+    descr: IDescrForm | FormBase;
     data?: IStream;
     getManager?: (manager: FormBase) => void;
 }
@@ -22,32 +22,37 @@ export class RnForm extends React.Component<IPropsRnForm, IStateRnForm> {
 
     public constructor(props: IPropsRnForm) {
         super(props);
-        this.state = {status: "Ready", manager: this.createManager()};
+        this.state = {status: "Ready", manager: this.createManager(props)};
     }
-    private createManager() {
-        const {props} = this;
-        const manager: FormBase = FormBase.createInstance(props.descr);
-        if (props.data) {
-            manager.reset(); // Установить для всех контроллеров дефолтные значения
-            manager.load(props.data, true);
+    private createManager(props: IPropsRnForm): FormBase {
+        const {descr, data, getManager} = props;
+        let manager: FormBase;
+        if (descr instanceof FormBase) {
+            manager = descr;
+        } else {
+            manager = FormBase.createInstance(descr);
+            if (data) {
+                manager.reset(); // Установить для всех контроллеров дефолтные значения
+                manager.load(data, true);
+            }
         }
-        if (this.props.getManager) {
-            this.props.getManager(manager);
+        if (getManager) {
+            getManager(manager);
         }
         return manager;
     }
 
     componentWillReceiveProps(nextProps: IPropsRnForm) {
         const {manager} = this.state;
-        if (this.props.data !== nextProps.data) {
+        if (this.props.descr !== nextProps.descr) {
+            this.setState({manager: this.createManager(nextProps)});
+        } else if (this.props.data !== nextProps.data) {
             this.setState({status: 'Wait'});
             // Если для компонента изменились данные, то загрузить новые данные в контроллер формы
             // Это случается, если одну форму показывать несколько раз. Например, в модальном окне.
             manager.unlock(true);  // Принудительно разлочить форму
             manager.reset();
             manager.load(nextProps.data);
-        } else if (this.props.descr !== nextProps.descr) {
-            this.setState({manager: this.createManager()});
         }
     }
 

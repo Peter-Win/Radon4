@@ -2,24 +2,26 @@
  * Created by PeterWin on 07.07.2019.
  */
 
-import {CommonComponent} from './component/CommonComponent';
+import {CommonComponent} from "./component/CommonComponent";
 
 export type TValue = string | number | boolean;
 
 export type TFieldValue = any;
 
-export enum Field {
-    default = "default",
-    disabled = "disabled",
-    disabledIf = "disabledIf",
-    hidden = "hidden",
-    name = "name",
-    label = "label",
-    value = "value",
-    visibleIf = "visibleIf",
+export const Field = {
+    default: "default",
+    disabled: "disabled",
+    disabledIf: "disabledIf",
+    errMsg: "errMsg",
+    hidden: "hidden",
+    label: "label",
+    name: "name",
+    regExp: "regExp",
+    value: "value",
+    visibleIf: "visibleIf",
 }
 
-export type FieldName = string | Field;
+export type FieldName = string;
 
 export interface IStream {
     [key: string]: any;

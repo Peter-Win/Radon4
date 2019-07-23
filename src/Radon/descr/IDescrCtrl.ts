@@ -2,8 +2,9 @@
  * Created by PeterWin on 07.07.2019.
  */
 
-import {RnComponent} from '../types';
-import {IDescrConverter} from './IDescrConverter';
+import {RnComponent} from "../types";
+import {IDescrConverter} from "./IDescrConverter";
+import {TDescrValidatorExt} from './IDescrValidator';
 
 export type TypeCtrl = string;
 export type TypeComponent = RnComponent | string;
@@ -18,5 +19,14 @@ export interface IDescrCtrl {
     component?: TypeComponent;
     disabled?: boolean;
     converters?: TDescrConverterExt[];
+    validators?: TDescrValidatorExt[];
+    cssClass?: string;
     [field: string]: any;
 }
+
+export const expandConverterExt = (sourceDescr: TDescrConverterExt): IDescrConverter => {
+    if (typeof sourceDescr === "string") {
+        return {type: sourceDescr};
+    }
+    return sourceDescr;
+};

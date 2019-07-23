@@ -1,0 +1,22 @@
+
+.props-table {
+    border-collapse: collapse;
+}
+.props-table td {
+    border: solid thin silver;
+    padding: .2em .6em;
+}
+.props-col1 {}
+.props-col2 input[type=text] {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+.props-col2 input[type=text]:focus {
+    outline: none;
+}
+
+.rn-error input[type=text] {
+    border: thin solid red;
+}
+.rn-error .rn-label {color: red;}

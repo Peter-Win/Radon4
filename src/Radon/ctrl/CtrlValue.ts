@@ -1,6 +1,6 @@
+import {CvtBase} from "../converter/CvtBase";
 import {CtrlBase} from "../CtrlBase";
 import {Field, IStream, TValue} from "../types";
-import {CvtBase} from '../converter/CvtBase';
 /**
  * Контроллер, который обрабатывает одно простое значение типа TValue
  * Наиболее типичные наследники: CtrlString, CtrlBool, CtrlDropList

@@ -1,11 +1,13 @@
+import {CommonComponent} from "./component/CommonComponent";
+import {CvtBase} from "./converter/CvtBase";
 import {CtrlsOwner} from "./CtrlsOwner";
-import {IDescrCtrl, TypeComponent} from './descr/IDescrCtrl';
+import {IDescrCtrl, TypeComponent} from "./descr/IDescrCtrl";
 import {FormBase} from "./FormBase";
 import {Rn} from "./Rn";
-import {Field, FieldName, IStream, RnComponent, TFieldValue, TValue} from './types';
+import {Field, FieldName, IStream, RnComponent, TFieldValue, TValue} from "./types";
 import {IVisitor, VisitorResult} from "./Visitor";
-import {CommonComponent} from './component/CommonComponent';
-import {CvtBase} from './converter/CvtBase';
+import {IDescrError} from './descr/IDescrError';
+import {ValidatorBase} from './validator/ValidatorBase';
 
 export interface IDictCtrls {
     [key: string]: typeof CtrlBase;
@@ -31,25 +33,24 @@ export class CtrlBase extends CtrlsOwner {
         return this.descr.name;
     }
     public static createInstance(params: IParamsCtrl): CtrlBase {
-        const {descr, form} = params;
-        const {type, ctrls} = descr;
+        const {descr: descr0, form} = params;
+        const {type} = descr0;
         const Constructor = Rn.dict.ctrls[type];
+        if (!Constructor) {
+            throw new Error(`Invalid ctrl type: ${type}`);
+        }
         const ctrl = new Constructor(params);
-        ctrl.key = CtrlBase.generateUniqueKey("ctrl");
+        const {descr} = ctrl;
+        const {ctrls} = descr;
+        ctrl.onInit();
+        ctrl._key = CtrlBase.generateUniqueKey("ctrl");
         ctrl.createCtrls(ctrls, form);
         ctrl.converters = (descr.converters || []).map((cvtDescr) => CvtBase.createInstance(cvtDescr, ctrl));
+        ctrl.validators = (descr.validators || []).map((vDescr) => ValidatorBase.createInstance(vDescr, ctrl));
         if (descr.disabled) {
             ctrl.lockCounter++;
         }
-        ctrl.onInit();
         return ctrl as CtrlBase;
-    }
-    private key: string;
-    private lockCounter: number = 0;
-    private bDisabled: boolean = false;
-    protected converters: CvtBase[];
-    public getKey(): string {
-        return this.key;
     }
     public static generateUniqueKey(prefix: string = "key"): string {
         return `${prefix}${staticUniqueIndex++}`;
@@ -58,13 +59,29 @@ export class CtrlBase extends CtrlsOwner {
 
     public readonly descr: IDescrCtrl;
 
+    /**
+     * Callback-функция, которая вызывается для перерисовки компонента
+     */
+    public dispatchChanges: TChangeDispatcher = null;
+    protected converters: CvtBase[];
+    protected validators: ValidatorBase[];
+    protected propsMap: IPropsMap = {};
+    private _key: string;
+    private lockCounter: number = 0;
+    private bDisabled: boolean = false;
+    private modified: IStream | null = null;
+
     protected constructor(params: IParamsCtrl) {
         super();
-        this.descr = {...params.descr};
+        this.descr = this.transformDescr(params.descr);
         this.form = params.form;
         this.owner = params.owner;
     }
-    protected onInit(): void {
+    public getKey(): string {
+        return this._key;
+    }
+    public get key(): string {
+        return this._key;
     }
 
     public load(stream: IStream, bConvert?: boolean): void {
@@ -118,7 +135,6 @@ export class CtrlBase extends CtrlsOwner {
         }
         return bNeedUpdate;
     }
-    private modified: IStream | null = null;
 
     /**
      * Эта функция вызывается только из FormBase.forceUpdate.
@@ -135,15 +151,6 @@ export class CtrlBase extends CtrlsOwner {
             this.modified = null;
         }
     }
-
-    /**
-     * Callback-функция, которая вызывается для перерисовки компонента
-     */
-    public dispatchChanges: TChangeDispatcher = null;
-
-    protected update(): void {
-        this.form.update();
-    }
     public isEqual(field: FieldName, value: TFieldValue): boolean {
         return this.get(field) === value;
     }
@@ -157,10 +164,6 @@ export class CtrlBase extends CtrlsOwner {
             i++;
         }
         return result || (ctrlEnd && ctrlEnd(this));
-    }
-
-    protected getDefaultComponent(): TypeComponent {
-        return CommonComponent;
     }
     public createComponent(): RnComponent {
         const componentDescr = this.descr.component || this.getDefaultComponent();
@@ -185,7 +188,6 @@ export class CtrlBase extends CtrlsOwner {
     public getPropsMap(): object {
         return this.propsMap;
     }
-    protected propsMap: IPropsMap = {};
 
     public isDisabled(): boolean {
         return this.lockCounter !== 0;
@@ -228,6 +230,49 @@ export class CtrlBase extends CtrlsOwner {
     }
     public isVisible(): boolean {
         return !this.get(Field.hidden, false);
+    }
+
+    /**
+     * метод переопределяется в специальных контролах типа CtrlInteger, в которых требуется лишь модификация описания
+     * @param {IDescrCtrl} descr
+     * @return {IDescrCtrl}
+     */
+    protected transformDescr(descr: IDescrCtrl): IDescrCtrl {
+        return {...descr};
+    }
+    protected onInit(): void {
+    }
+
+    protected update(): void {
+        this.form.update();
+    }
+
+    protected getDefaultComponent(): TypeComponent {
+        return CommonComponent;
+    }
+
+    public clearError(): void {
+        this.setError({msg: ""});
+    }
+    public getErrorMessage(): string {
+        return this.get(Field.errMsg, "") as string;
+    }
+    public setError(err: IDescrError): void {
+        this.set(Field.errMsg, err.msg);
+    }
+
+    /**
+     * Если контроллер невидим, то эта функция для него не вызывается
+     * @param {IDescrError[]} errors
+     */
+    public check(errors: IDescrError[]): void {
+        // Вызываются валидаторы по порядку. Если очередной даёт ошибку, остальные не проверяются.
+        for (let validator of this.validators) {
+            const msg = validator.check();
+            if (msg) {
+                errors.push(validator.createErrorInfo(msg));
+            }
+        }
     }
 }
 interface IPropsMap {

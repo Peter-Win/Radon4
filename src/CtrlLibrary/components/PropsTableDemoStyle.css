@@ -1,0 +1,26 @@
+.props-demo {
+    display: flex;
+}
+.props-demo-list {
+    flex: 1;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.props-demo-list li {
+    list-style: none;
+    margin: 0;
+    padding: .2em .6em;
+    cursor: pointer;
+    text-align: center;
+    border: thin solid silver;
+}
+.props-demo-list li:hover {
+    background-color: #AFE;
+}
+.props-demo-list li.active {
+    background-color: #33acfe;
+}
+.props-demo-form {
+    flex: 3;
+}
