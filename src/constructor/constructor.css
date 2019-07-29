@@ -63,3 +63,12 @@
 .con-drag-right {
     display: inline-block;
 }
+
+/* История команд undo / redo */
+.con-cmd-history {
+    display: inline-block;
+    border: thin solid black;
+    padding: 0.2em 0.6em;
+    margin-left: .5em;
+    vertical-align: top;
+}

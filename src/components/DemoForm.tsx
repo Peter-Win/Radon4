@@ -44,6 +44,44 @@ const formDescr = {
             default: true,
         },
         {
+            label: "Варианты",
+            name: "case",
+            type: "DropList",
+            default: 2,
+            options: [{value: 1, label: "First"}, {value: 2, label: "Second"}],
+        },
+        {
+            type: "TabHost",
+            default: "First",
+            name: "mainPart",
+            ctrls: [
+                {
+                    type: "TabPage",
+                    option: "First",
+                    label: "Первая вкладка",
+                    ctrls: [
+                        {
+                            type: "String",
+                            name: "firstInfo",
+                            label: "Инфо 1",
+                        },
+                    ],
+                },
+                {
+                    type: "TabPage",
+                    option: "Second",
+                    label: "Вторая вкладка",
+                    ctrls: [
+                        {
+                            type: "String",
+                            name: "secondInfo",
+                            label: "Инфо 2",
+                        },
+                    ],
+                }
+            ],
+        },
+        {
             label: 'Готово!',
             type: 'Submit'
         },

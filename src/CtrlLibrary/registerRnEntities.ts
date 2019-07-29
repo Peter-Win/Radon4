@@ -1,8 +1,9 @@
 import {Rn} from '../Radon/Rn';
 import {StringForProps} from './components/StringForProps';
 import {PropsTable} from './components/PropsTable';
-import {DummyComponent} from '../constructor/DummyComponent';
-import {DropFrame} from '../constructor/DropFrame';
+import {DummyComponent} from '../constructor/board/DummyComponent';
+import {DropFrame} from '../constructor/board/DropFrame';
+import {ValidatorUniqueCtrlName} from './validator/ValidatorUniqueCtrlName';
 
 export const registerRnEntities = () => {
     Rn.reg({
@@ -11,6 +12,9 @@ export const registerRnEntities = () => {
             DropFrame,
             PropsTable,
             StringForProps,
-        }
+        },
+        validators: {
+            UniqueCtrlName: ValidatorUniqueCtrlName,
+        },
     });
 };

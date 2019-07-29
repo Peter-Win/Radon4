@@ -12,8 +12,15 @@ export interface IPropsCommonComponent {
     hidden?: boolean;
     cssClass?: string;
     errMsg: string;
+    setFocusableElement(element: HTMLElement | null): void;
 }
 
 export const CommonComponent: React.FC<IPropsCommonComponent> = (props) => (
     <div style={{color: 'red'}}>Invalid component {props.name}:{props.type}</div>
 );
+
+export class CommonComponentClass extends React.Component<IPropsCommonComponent> {
+    render() {
+        return <CommonComponent {...this.props} />
+    }
+}

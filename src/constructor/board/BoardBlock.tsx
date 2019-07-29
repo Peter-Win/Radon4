@@ -4,15 +4,13 @@
  */
 import * as React from "react";
 import { useDrop } from 'react-dnd';
-import {ItemTypes} from './ItemTypes';
+import {ItemTypes} from '../ItemTypes';
 import {BoardItem} from './BoardItem';
-import {ConMaster} from './ConMaster';
+import {ConMaster} from '../ConMaster';
 import {observer} from "mobx-react";
-import {DummyItem} from './DummyItem';
-import {UsefulCtrl} from '../CtrlLibrary/UsefulCtrl';
-import {CtrlLibrary} from '../CtrlLibrary/CtrlLibrary';
-import {RnCtrlShell} from '../Radon/RnCtrlShell';
-import {IPropsCommonComponent} from '../Radon/component/CommonComponent';
+import {DummyItem} from '../DummyItem';
+import {UsefulCtrl} from '../../CtrlLibrary/UsefulCtrl';
+import {CtrlLibrary} from '../../CtrlLibrary/CtrlLibrary';
 
 function getStyle(backgroundColor: string): React.CSSProperties {
     return {
@@ -35,10 +33,11 @@ interface INewUsefulCtrl {
     id: string;
 }
 
-interface IPropsDropFrame extends IPropsCommonComponent {
-}
-
-export const DropFrame: React.FC<IPropsDropFrame> = observer( (props) => {
+/**
+ * @deprecated
+ * @type {(props) => any}
+ */
+export const BoardBlock = observer( (props) => {
 
     const [{ isOver, isOverCurrent }, drop] = useDrop({
         accept: ItemTypes.NewUC,
@@ -57,13 +56,13 @@ export const DropFrame: React.FC<IPropsDropFrame> = observer( (props) => {
 
     let backgroundColor = 'rgba(0, 0, 0, .5)';
 
-    if (isOverCurrent) {
+    if (isOverCurrent /*|| (isOver && greedy)*/) {
         backgroundColor = 'darkgreen'
     }
 
     return (
         <div ref={drop} style={getStyle(backgroundColor)}>
-            {props.ctrlList.map((ctrl) => <RnCtrlShell key={ctrl.key} ctrl={ctrl} />)}
+            {ConMaster.get().parameters.map((dummy, i) => <BoardItem key={dummy.key} index={i} dummy={dummy} />)}
         </div>
     )
 });

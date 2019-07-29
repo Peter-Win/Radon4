@@ -10,9 +10,11 @@ export const descrBase: IDescrUsefulCtrl = {
             name: "name",
             label: "Идентификатор",
             type: "String",
+            autofocus: true,
             validators: [
                 {type: "NonEmpty", msg: "Не задан идентификатор"},
-                {type: "RegExp", regExp: "/^[a-z0-9_]*$/i", msg: "Идентификатор содержит недопустимые символы"}
+                {type: "RegExp", regExp: "/^[a-z0-9_]*$/i", msg: "Идентификатор содержит недопустимые символы"},
+                "UniqueCtrlName", // Проверка отсутствия дублирования имён
             ],
         },
         {

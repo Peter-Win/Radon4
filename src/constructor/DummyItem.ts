@@ -3,7 +3,8 @@ import {UsefulCtrl} from '../CtrlLibrary/UsefulCtrl';
 import {IStream} from '../Radon/types';
 import {IDescrCtrl} from '../Radon/descr/IDescrCtrl';
 import {observable} from 'mobx';
-import {FormBase} from '../Radon/FormBase';
+import {FormBase, IFormEvent} from '../Radon/FormBase';
+import {IDescrForm} from '../Radon/descr/IDescrForm';
 
 export class DummyItem {
     public readonly key: number;
@@ -12,13 +13,22 @@ export class DummyItem {
     private _data: IStream = {};  // Данные в неконвертированном виде
     @observable
     public errMsg: string = "";
+    private propsManager: FormBase;
     constructor(private usefulCtrl: UsefulCtrl) {
         this.key = ++sUniqueKey;
         this.text = this.usefulCtrl.getLabel();
-        const manager: FormBase = this.createManager();
-        manager.reset();
-        this.data = manager.save({}, false);
-        console.log('DummyItem.constructor. data=', this.data);
+
+        this.propsManager = this.createPropsManager();
+        this.propsManager.reset();
+        this.data = this.propsManager.save({}, false);
+    }
+
+    /**
+     * Текстовое описание элемента
+     * @return {string}
+     */
+    public getInfoMessage(): string {
+        return this.text;
     }
     public isCurrent(): boolean {
         return this === ConMaster.get().currentDummy;
@@ -34,7 +44,8 @@ export class DummyItem {
     }
     public set data(data:IStream) {
         this._data = data;
-        this.checkError();
+        // Надо проверять ошибки у всех, т.к. дублирование имен действует на несколько элементов
+        ConMaster.get().parameters.forEach((dummy) => dummy.checkError());
     }
     public get data(): IStream {
         return this._data;
@@ -49,6 +60,14 @@ export class DummyItem {
         meta.type = this.usefulCtrl.getType();
         return meta as IDescrCtrl;
     }
+    public getResultName(): string {
+        return this.data.name;
+    }
+
+    /**
+     * @deprecated
+     * @return {FormBase}
+     */
     private createManager(): FormBase {
         const descr = {
             name: "temp",
@@ -56,12 +75,40 @@ export class DummyItem {
         };
         return FormBase.createInstance(descr);
     }
-    private checkError(manager?: FormBase) {
-        manager = manager || this.createManager();
-        manager.load(this.data, true);
+    public checkError() {
+        const manager = this.getPropsManager();
+        // manager.load(this.data, true);
         manager.forceUpdate();
         const err = manager.getErrors()[0];
         this.errMsg =  err ? err.msg : "";
+    }
+    public getPropsManager(): FormBase {
+        return this.propsManager;
+    }
+    private createPropsManager(): FormBase {
+        const usefulCtrl = this.usefulCtrl;
+        const propsFormDescr: IDescrForm = {
+            name: "propsOf" + usefulCtrl.name,
+            label: usefulCtrl.getLabel(),
+            ctrls: [
+                {
+                    type: 'Block',
+                    component: 'PropsTable',
+                    label: usefulCtrl.getLabel(),
+                    ctrls: this.buildMeta(),
+                },
+            ],
+        };
+        const manager: FormBase = FormBase.createInstance(propsFormDescr);
+        manager.addEventListener("update", (event: IFormEvent) => {
+            const data: IStream = manager.save({}, false);
+            if (JSON.stringify(this.data) !== JSON.stringify(data)) {
+                // Эта операция приводит к перерисовке. Поэтому её выполняем только при наличии изменений.
+                this.data = data;
+            }
+        });
+        manager.onUserChange = ConMaster.onUserCtrlChange;
+        return manager;
     }
 }
 let sUniqueKey: number = 0;

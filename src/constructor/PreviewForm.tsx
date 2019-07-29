@@ -19,9 +19,12 @@ export const PreviewForm: React.FC = observer( (props) => {
     return (
         <div className="con-preview-box">
             <h3>Preview</h3>
-            {formMsg ? <div style={{color: 'red'}}>{formMsg}</div> : <RnForm descr={descr} />}
+            <h4>metadata:</h4>
             <pre>{JSON.stringify(resultMeta, null, '  ')}</pre>
+            <h4>demo data:</h4>
+            <pre>{JSON.stringify(master.demoData, null, '  ')}</pre>
         </div>
     )
 });
 
+// {formMsg ? <div style={{color: 'red'}}>{formMsg}</div> : <RnForm descr={descr} />}

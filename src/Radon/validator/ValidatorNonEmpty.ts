@@ -15,7 +15,6 @@ export class ValidatorNonEmpty extends ValidatorBase {
     }
     public check(srcValue: any = null): string {
         const curValue: any = srcValue === null ? this.ctrl.val(false) : srcValue;
-        const curStr = String(curValue);
-        return !curStr ? this.getMessage() : "";
+        return !curValue ? this.getMessage() : "";
     }
 }

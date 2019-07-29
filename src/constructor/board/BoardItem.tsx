@@ -3,10 +3,10 @@ import {observer} from "mobx-react";
 import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd';
 import { XYCoord } from 'dnd-core';
 import * as cn from "classnames";
-import {DummyItem} from './DummyItem';
-import {ConMaster} from './ConMaster';
-import {ItemTypes} from './ItemTypes';
-import {Icon} from './Icon';
+import {DummyItem} from '../DummyItem';
+import {ConMaster} from '../ConMaster';
+import {ItemTypes} from '../ItemTypes';
+import {Icon} from '../Icon';
 
 export interface IPropsBoardItem {
     index: number;
@@ -19,6 +19,10 @@ interface DragItem {
     type: string;
 }
 
+/**
+ * @deprecated
+ * @type {(props) => any}
+ */
 export const BoardItem: React.FC<IPropsBoardItem> = observer( (props) => {
     const ref = React.useRef<HTMLDivElement>(null);
     const [, drop] = useDrop({

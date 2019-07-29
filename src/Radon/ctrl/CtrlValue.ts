@@ -46,6 +46,6 @@ export class CtrlValue extends CtrlBase {
      * @param {TValue} value
      */
     protected onChangeValue(value: TValue, eventType: string = "") {
-        this.setValue(value);
+        this.form.onUserChange(this, () => this.setValue(value));
     }
 }

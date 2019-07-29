@@ -2,14 +2,14 @@ import * as React from "react";
 import {CtrlBase} from "./CtrlBase";
 import {CommonComponent} from './component/CommonComponent';
 import {IDescrCtrl} from './descr/IDescrCtrl';
-import {IStream} from './types';
+import {IStream, RnComponent} from './types';
 
 export interface IPropsRnCtrlShell {
     ctrl: CtrlBase;
 }
 
 export class RnCtrlShell extends React.Component<IPropsRnCtrlShell, IDescrCtrl> {
-    private component: typeof CommonComponent;
+    private component: RnComponent;
     private bMount: boolean = false;
     constructor(props: IPropsRnCtrlShell) {
         super(props);
@@ -34,6 +34,10 @@ export class RnCtrlShell extends React.Component<IPropsRnCtrlShell, IDescrCtrl> 
         }
         this.bMount = false;
     }
+    setFocusableElement = (element: HTMLElement | null) => {
+        this.props.ctrl.setFocusableElement(element);
+    };
+
     render() {
         const {ctrl} = this.props;
         if (!this.component || !ctrl.isVisible()) {
@@ -45,19 +49,13 @@ export class RnCtrlShell extends React.Component<IPropsRnCtrlShell, IDescrCtrl> 
             {...this.state}
             errMsg={ctrl.getErrorMessage()}
             ctrlList={ctrlList}
+            setFocusableElement={this.setFocusableElement}
             {...ctrl.getPropsMap()}
         />);
     }
-    render2() {
-        const {ctrl} = this.props;
-        return <div>
-            Ctrl {ctrl.name}: {ctrl.get('label')}, slaves={ctrl.ctrls.length}
-        </div>;
-    }
 }
 /*
-            setFocusableElement={this.setFocusableElement}
+
             visit={this.visit}
-            disabled={this.checkDisabled()}
 
  */

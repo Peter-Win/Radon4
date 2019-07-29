@@ -1,14 +1,15 @@
 import * as React from "react";
 import * as cn from "classnames";
-import {DummyItem} from './DummyItem';
-import {IPropsCommonComponent} from '../Radon/component/CommonComponent';
-import {ConMaster} from './ConMaster';
+import {DummyItem} from '../DummyItem';
+import {IPropsCommonComponent} from '../../Radon/component/CommonComponent';
+import {ConMaster} from '../ConMaster';
 import {observer} from "mobx-react";
-import {RnCtrlShell} from '../Radon/RnCtrlShell';
-import {CtrlBase} from '../Radon/CtrlBase';
+import {RnCtrlShell} from '../../Radon/RnCtrlShell';
+import {CtrlBase} from '../../Radon/CtrlBase';
 import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd';
 import { XYCoord } from 'dnd-core';
-import {ItemTypes} from './ItemTypes';
+import {ItemTypes} from '../ItemTypes';
+import {CmdMoveDummy} from '../commands/CmdMoveDummy';
 
 interface IPropsDummyComponent extends IPropsCommonComponent {
     index: number;
@@ -68,11 +69,15 @@ export const DummyComponent: React.FC<IPropsDummyComponent> = observer( (props) 
             item.index = hoverIndex;
         },
     });
-    const [{ isDragging }, drag, preview] = useDrag({
+    const [{ isDragging, srcIndex }, drag, preview] = useDrag({
         item: { type: ItemTypes.CARD, id: props.dummy.key, index: props.dummy.getIndex() },
         collect: (monitor: any) => ({
             isDragging: monitor.isDragging(),
+            srcIndex: props.dummy.getIndex(),
         }),
+        end: (item: any, monitor: any) => {
+            ConMaster.get().execCommand(new CmdMoveDummy(srcIndex, item.index, true));
+        },
     });
     const opacity = isDragging ? 0 : 1;
     drag(drop(ref));
@@ -88,7 +93,9 @@ export const DummyComponent: React.FC<IPropsDummyComponent> = observer( (props) 
             onClick={() => dummy.activate()}
             title={errMsg}
         >
-            <div draggable className="con-drag-right" onDragStart={(e)=>{e.preventDefault(); console.log('Prevent drag start')}}>
+            {/* Необходимо блокировать операции drag внутри данного контейнера.
+            Иначе вместо перетаскивания ползунка слайдера начинает двигаться весь бокс. */}
+            <div draggable className="con-drag-right" onDragStart={(e)=>e.preventDefault()}>
                 {ctrlList.map((ctrl: CtrlBase) => <RnCtrlShell key={ctrl.getKey()} ctrl={ctrl} />)}
             </div>
         </div>

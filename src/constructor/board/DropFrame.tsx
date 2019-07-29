@@ -4,13 +4,16 @@
  */
 import * as React from "react";
 import { useDrop } from 'react-dnd';
-import {ItemTypes} from './ItemTypes';
+import {ItemTypes} from '../ItemTypes';
 import {BoardItem} from './BoardItem';
-import {ConMaster} from './ConMaster';
+import {ConMaster} from '../ConMaster';
 import {observer} from "mobx-react";
-import {DummyItem} from './DummyItem';
-import {UsefulCtrl} from '../CtrlLibrary/UsefulCtrl';
-import {CtrlLibrary} from '../CtrlLibrary/CtrlLibrary';
+import {DummyItem} from '../DummyItem';
+import {UsefulCtrl} from '../../CtrlLibrary/UsefulCtrl';
+import {CtrlLibrary} from '../../CtrlLibrary/CtrlLibrary';
+import {RnCtrlShell} from '../../Radon/RnCtrlShell';
+import {IPropsCommonComponent} from '../../Radon/component/CommonComponent';
+import {CmdInsertDummy} from '../commands/CmdInsertDummy';
 
 function getStyle(backgroundColor: string): React.CSSProperties {
     return {
@@ -33,16 +36,21 @@ interface INewUsefulCtrl {
     id: string;
 }
 
-export const BoardBlock = observer( (props) => {
+interface IPropsDropFrame extends IPropsCommonComponent {
+}
+
+export const DropFrame: React.FC<IPropsDropFrame> = observer( (props) => {
 
     const [{ isOver, isOverCurrent }, drop] = useDrop({
         accept: ItemTypes.NewUC,
         drop(item, monitor) {
             const didDrop = monitor.didDrop();
-            const usefulCtrl = CtrlLibrary.dict.get((item as INewUsefulCtrl).id);
-            const dummy = new DummyItem(usefulCtrl);
-            ConMaster.get().parameters.push(dummy);
-            ConMaster.get().setCurrentDummy(dummy);
+            const type: string = (item as INewUsefulCtrl).id;
+            // const usefulCtrl = CtrlLibrary.dict.get((item as INewUsefulCtrl).id);
+            // const dummy = new DummyItem(usefulCtrl);
+            // ConMaster.get().parameters.push(dummy);
+            // ConMaster.get().setCurrentDummy(dummy);
+            ConMaster.get().execCommand(new CmdInsertDummy(type));
         },
         collect: monitor => ({
             isOver: monitor.isOver(),
@@ -52,13 +60,13 @@ export const BoardBlock = observer( (props) => {
 
     let backgroundColor = 'rgba(0, 0, 0, .5)';
 
-    if (isOverCurrent /*|| (isOver && greedy)*/) {
+    if (isOverCurrent) {
         backgroundColor = 'darkgreen'
     }
 
     return (
         <div ref={drop} style={getStyle(backgroundColor)}>
-            {ConMaster.get().parameters.map((dummy, i) => <BoardItem key={dummy.key} index={i} dummy={dummy} />)}
+            {props.ctrlList.map((ctrl) => <RnCtrlShell key={ctrl.key} ctrl={ctrl} />)}
         </div>
     )
 });

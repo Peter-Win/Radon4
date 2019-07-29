@@ -8,10 +8,13 @@ export interface IPropsStringStd extends IPropsCommonComponent {
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export const StringStd: React.FC<IPropsStringStd> = (props) => (
-    <FieldStd {...props}>
-        <StringBox value={props.value} onChange={props.onChange}>
-            <input type="text" name={props.name} disabled={props.disabled} />
-        </StringBox>
-    </FieldStd>
-);
+export class StringStd extends React.Component<IPropsStringStd> {
+    render() {
+        const {props} = this;
+        return <FieldStd {...props}>
+            <StringBox value={props.value} onChange={props.onChange}>
+                <input type="text" name={props.name} disabled={props.disabled} ref={props.setFocusableElement} />
+            </StringBox>
+        </FieldStd>
+    }
+}

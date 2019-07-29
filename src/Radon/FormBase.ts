@@ -47,6 +47,7 @@ export class FormBase extends CtrlsOwner {
 
     private subscribers: Map<TFormEventType, Set<TFormEventListener>> = new Map();
     private errors: IDescrError[] = [];
+    public focusRequest: CtrlBase | null = null;
 
     protected constructor(descr: IDescrForm) {
         super();
@@ -131,6 +132,19 @@ export class FormBase extends CtrlsOwner {
 
     public unlock(force: boolean = false) {
         this.lock(force ? -this.lockCounter : -1);
+    }
+
+    public findAutoFocus(): CtrlBase | null {
+        const result: VisitorResult = this.walk({
+            ctrlBegin: (ctrl) => ctrl.get(Field.autofocus) ? ctrl : false,
+        });
+        return result ? result as CtrlBase : null;
+    }
+    public focus(): void {
+        const ctrlAF = this.findAutoFocus();
+        if (ctrlAF) {
+            ctrlAF.focus();
+        }
     }
 
     public onSubmit(): boolean {
@@ -255,6 +269,9 @@ export class FormBase extends CtrlsOwner {
     public getErrors(): IDescrError[] {
         return this.errors;
     }
+    public onUserChange = (ctrl: CtrlBase, make: ()=>void) => {
+        make();
+    };
 }
 
 type TExpressionFunc = (source: CtrlBase) => any;

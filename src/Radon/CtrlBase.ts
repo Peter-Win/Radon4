@@ -271,7 +271,64 @@ export class CtrlBase extends CtrlsOwner {
             const msg = validator.check();
             if (msg) {
                 errors.push(validator.createErrorInfo(msg));
+                break;
             }
+        }
+    }
+
+    ///////// Focus subsystem
+    /**
+     * Установить фокус на данный контроллер.
+     * Позволяет дождаться, пока у контроллера появится элемент.
+     * Потому что иногда контроллер создаётся раньше, чем компонент.
+     * @returns {void}
+     */
+    public focus() {
+        // Получить цепочку владельцев
+        const owners: CtrlsOwner[] = [];
+        let curCtrl: CtrlsOwner = this;
+        while (curCtrl && curCtrl !== this.form) {
+            owners.unshift(curCtrl);
+            curCtrl = curCtrl.owner;
+        }
+        // Теперь сверху вниз оповестить о том, что элемент получит фокус
+        owners.forEach((curCtrl) => curCtrl.preFocus(this));
+
+        // Нужно небольшое время, чтобы отрисовались компоненты. focusableElement может измениться при отрисовке
+        setTimeout(() => {
+            const {focusableElement} = this;
+            if (focusableElement) {
+                this.focusForced();
+            } else {
+                this.form.focusRequest = this;
+            }
+        }, 10);
+    }
+    /**
+     * Установить фокус на данный контроллер.
+     * Срабатывает только для тех контроллеров, которые имеют focusableElement
+     * @returns {void}
+     */
+    protected focusForced() {
+        const {focusableElement} = this;
+        if (focusableElement && focusableElement.focus) {
+            focusableElement.focus();
+        }
+    }
+
+    private focusableElement: HTMLElement | null = null;
+
+    public getFocusableElement(): HTMLElement | null {
+        return this.focusableElement;
+    }
+
+    public setFocusableElement(element: HTMLElement | null) {
+        this.focusableElement = element;
+
+        // Этот элемент может ожидать фокусировки
+        if (this.form.focusRequest === this) {
+            this.focusForced();
+            this.form.focusRequest = null;
         }
     }
 }

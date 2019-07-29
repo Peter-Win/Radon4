@@ -5,6 +5,13 @@ import {StringBox} from '../../Radon/container/StringBox';
 
 export const StringForProps: React.FC<IPropsStringStd> = (props) => (
     <StringBox value={props.value} onChange={props.onChange}>
-        <input type="text" name={props.name} disabled={props.disabled} className={cn({invalid: props.errMsg})} />
+        <input
+            type="text"
+            name={props.name}
+            disabled={props.disabled}
+            className={cn({invalid: props.errMsg})}
+            title={props.errMsg}
+            ref={props.setFocusableElement}
+        />
     </StringBox>
 );

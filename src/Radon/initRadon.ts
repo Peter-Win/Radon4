@@ -21,6 +21,11 @@ import {CtrlRange} from './ctrl/CtrlRange';
 import {ValidatorNonEmpty} from './validator/ValidatorNonEmpty';
 import {CvtExcludeEmpty} from './converter/CvtExcludeEmpty';
 import {ValidatorRegExp} from './validator/ValidatorRegExp';
+import {CtrlTabHost} from './ctrl/CtrlTabHost';
+import {TabHost} from './component/TabHost';
+import {CtrlTabPage} from './ctrl/CtrlTabPage';
+import {CtrlDropList} from './ctrl/CtrlDropList';
+import {SelectStd} from './component/SelectStd';
 
 export const initRadon = () => {
     Rn.reg({
@@ -32,19 +37,24 @@ export const initRadon = () => {
             BlockStd,
             CheckBox,
             ResetStd,
+            SelectStd,
             SliderStd,
             StringStd,
             SubmitStd,
+            TabHost,
             TextArea,
         },
         ctrls: {
             Block: CtrlBlock,
             Boolean: CtrlBoolean,
+            DropList: CtrlDropList,
             Integer: CtrlInteger,
             Range: CtrlRange,
             Reset: CtrlReset,
             String: CtrlString,
             Submit: CtrlSubmit,
+            TabHost: CtrlTabHost,
+            TabPage: CtrlTabPage,
         },
         forms: {
             Base: FormBase,

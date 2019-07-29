@@ -29,6 +29,7 @@ export class RnForm extends React.Component<IPropsRnForm, IStateRnForm> {
         let manager: FormBase;
         if (descr instanceof FormBase) {
             manager = descr;
+            manager.forceUpdate();
         } else {
             manager = FormBase.createInstance(descr);
             if (data) {

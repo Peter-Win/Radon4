@@ -16,7 +16,8 @@ export class App extends React.Component<{}, {}> {
     public render() {
         return (
             <DndProvider backend={HTML5Backend}>
-                <ConstructorFrame />
+                {/*<ConstructorFrame />*/}
+                <DemoForm />
             </DndProvider>
         );
     }

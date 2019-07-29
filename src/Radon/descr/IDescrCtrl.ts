@@ -21,6 +21,7 @@ export interface IDescrCtrl {
     converters?: TDescrConverterExt[];
     validators?: TDescrValidatorExt[];
     cssClass?: string;
+    autofocus?: boolean;
     [field: string]: any;
 }
 

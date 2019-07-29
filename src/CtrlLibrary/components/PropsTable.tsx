@@ -29,7 +29,7 @@ const PropsTableRow: React.FC<IPropsPropsTableRow> = (props) => {
     const {ctrl} = props;
     const errMsg: string = ctrl.getErrorMessage();
     return (
-        <tr title={errMsg}>
+        <tr>
             <td className="props-col1">{props.ctrl.get(Field.label)}</td>
             <td className="props-col2"><RnCtrlShell ctrl={props.ctrl} /></td>
         </tr>
