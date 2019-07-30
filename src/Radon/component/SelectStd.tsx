@@ -6,7 +6,7 @@ import {FieldStd} from '../container/FieldStd';
 import {CtrlBase} from '../CtrlBase';
 import {ISelectOption} from '../ctrl/CtrlDropList';
 
-interface IPropsSelectStd extends IPropsCommonComponent {
+export interface IPropsSelectStd extends IPropsCommonComponent {
     value: TValue;
     viewOptions: ISelectOption[];
     setValue: (value: string) => void;

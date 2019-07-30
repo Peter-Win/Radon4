@@ -20,7 +20,9 @@ export class DummyItem {
 
         this.propsManager = this.createPropsManager();
         this.propsManager.reset();
-        this.data = this.propsManager.save({}, false);
+        const data = this.propsManager.save({}, false)
+        this.data = data;
+        console.log('DummyItem.constr.', this, ', data=', data);
     }
 
     /**
@@ -54,7 +56,7 @@ export class DummyItem {
         return this.usefulCtrl.getPropsDescr();
     }
     public getResultMeta(): IDescrCtrl {
-        const manager = this.createManager();
+        const manager = this.getPropsManager();
         manager.load(this.data, false);
         const meta = manager.save({}, true);
         meta.type = this.usefulCtrl.getType();

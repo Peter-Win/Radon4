@@ -61,6 +61,11 @@ export class FormBase extends CtrlsOwner {
     public save(stream?: IStream, bConvert?: boolean): IStream {
         return this.saveItems(stream, bConvert);
     }
+    public reset() {
+        this.walk({
+            ctrlBegin: (ctrl: CtrlBase) => ctrl.reset(),
+        });
+    }
 
     /**
      * Обход.

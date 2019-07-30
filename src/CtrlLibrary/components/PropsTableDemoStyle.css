@@ -24,3 +24,9 @@
 .props-demo-form {
     flex: 3;
 }
+.invalid .props-col1 {
+    color: red;
+}
+.invalid.props-row {
+    background-color: #FEE;
+}

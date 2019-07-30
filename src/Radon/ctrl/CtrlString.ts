@@ -12,4 +12,5 @@ export class CtrlString extends CtrlValue {
             this.onChangeValue(event.target.value, event.type);
         };
     }
+
 }

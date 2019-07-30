@@ -5,6 +5,7 @@
  * а в правой - компонент контроллера, который адаптирован для вывода в таблице.
  */
 import * as React from 'react';
+import * as cn from "classnames";
 import {IPropsCommonComponent} from '../../Radon/component/CommonComponent';
 import {CtrlBase} from '../../Radon/CtrlBase';
 import {RnCtrlShell} from '../../Radon/RnCtrlShell';
@@ -16,22 +17,20 @@ interface IPropsPropsTable extends IPropsCommonComponent {
 export const PropsTable: React.FC<IPropsPropsTable> = (props) => (
     <table className="props-table">
         <tbody>
-        {props.ctrlList.map((ctrl: CtrlBase) => (<PropsTableRow key={ctrl.getKey()} ctrl={ctrl} />))}
+        {props.ctrlList.map((ctrl: CtrlBase) => (<RnCtrlShell key={ctrl.key} ctrl={ctrl} />))}
         </tbody>
     </table>
 );
 
-interface IPropsPropsTableRow {
-    ctrl: CtrlBase;
+interface IPropsPropsTableRow extends IPropsCommonComponent {
 }
 
-const PropsTableRow: React.FC<IPropsPropsTableRow> = (props) => {
-    const {ctrl} = props;
-    const errMsg: string = ctrl.getErrorMessage();
+export const PropsTableRow: React.FC<IPropsPropsTableRow> = (props) => {
+    const {errMsg, label, children} = props;
     return (
-        <tr>
-            <td className="props-col1">{props.ctrl.get(Field.label)}</td>
-            <td className="props-col2"><RnCtrlShell ctrl={props.ctrl} /></td>
+        <tr title={errMsg} className={cn({invalid: !!errMsg}, "props-row")}>
+            <td className="props-col1">{label}</td>
+            <td className="props-col2">{children}</td>
         </tr>
     );
 };

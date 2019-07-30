@@ -1,13 +1,12 @@
 import * as React from 'react';
 import {IPropsStringStd} from '../../Radon/component/StringStd';
-import {StringBox} from '../../Radon/container/StringBox';
 import {PropsTableRow} from './PropsTable';
+import {StringBox} from '../../Radon/container/StringBox';
 
-export const StringForProps: React.FC<IPropsStringStd> = (props) => (
+export const TextForProps: React.FC<IPropsStringStd> = (props) => (
     <PropsTableRow {...props}>
         <StringBox value={props.value} onChange={props.onChange}>
-            <input
-                type="text"
+            <textarea
                 name={props.name}
                 disabled={props.disabled}
                 ref={props.setFocusableElement}

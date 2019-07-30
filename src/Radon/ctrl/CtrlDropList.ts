@@ -63,6 +63,8 @@ export const buildList = (descr: IDescrDropList, optionCreator?: FnOptionCreator
     const {emptyLabel, emptyValue = '', sort} = descr;
     if (sort === 'ASC') {
         list.sort((a, b) => cmp(a.label, b.label));
+    } else if (sort === "DESC") {
+        list.sort((a, b) => -cmp(a.label, b.label));
     }
     if (emptyLabel != null) {
         list.unshift(optionCreator({value: emptyValue, label: emptyLabel, record: null}));

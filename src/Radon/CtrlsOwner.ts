@@ -22,7 +22,7 @@ export class CtrlsOwner {
         }, stream || {});
     }
     public reset(): void {
-        this.ctrls.forEach((ctrl) => ctrl.reset());
+        // this.ctrls.forEach((ctrl) => ctrl.reset());
     }
     protected createCtrls(descrList: IDescrCtrl[] | null, form: FormBase) {
         if (descrList) {

@@ -8,8 +8,11 @@ import {IStream} from '../types';
 
 export class CvtExcludeEmpty extends CvtBase {
     public write(stream: IStream): void {
+        if (!this.ctrl.name) {
+            return;
+        }
         const value: any = stream[this.ctrl.name];
-        if (value === "") {
+        if (value === "" || value === null) {
             delete stream[this.ctrl.name];
         }
     }

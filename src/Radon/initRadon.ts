@@ -26,12 +26,15 @@ import {TabHost} from './component/TabHost';
 import {CtrlTabPage} from './ctrl/CtrlTabPage';
 import {CtrlDropList} from './ctrl/CtrlDropList';
 import {SelectStd} from './component/SelectStd';
+import {CvtJson} from './converter/CvtJson';
+import {ValidatorJson} from './validator/ValidatorJson';
 
 export const initRadon = () => {
     Rn.reg({
         converters: {
             ExcludeEmpty: CvtExcludeEmpty,
             Number: CvtNumber,
+            JSON: CvtJson,
         },
         components: {
             BlockStd,
@@ -62,6 +65,7 @@ export const initRadon = () => {
         validators: {
             NonEmpty: ValidatorNonEmpty,
             RegExp: ValidatorRegExp,
+            JSON: ValidatorJson,
         },
     });
 };

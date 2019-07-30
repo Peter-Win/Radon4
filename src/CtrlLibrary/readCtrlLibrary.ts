@@ -46,6 +46,7 @@ export const readCtrlLibrary = (sourceList: IDescrUsefulCtrl[]): UsefulCtrl[] =>
 const defaultCompDict: Map<string, string> = new Map([
     ["String", "StringForProps"],
     ["Integer", "StringForProps"],
+    ["DropList", "DropListForProps"],
 ]);
 
 /**

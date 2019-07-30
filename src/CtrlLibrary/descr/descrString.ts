@@ -12,6 +12,7 @@ export const descrString: IDescrUsefulCtrl = {
             name: "maxLength",
             label: "Максимальная длина",
             type: "Integer",
+            converters: ["Number", "ExcludeEmpty"],
         },
     ],
 };

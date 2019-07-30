@@ -6,6 +6,7 @@ import {IDescrCtrl} from "../Radon/descr/IDescrCtrl";
 export interface IDescrUsefulCtrl {
     name: string;   // Имя, зарегистрированное в Rn.descr.ctrls
     superClass: string; // Имя, зарегистрированние в Rn.descr.ctrls
+    dummyType?: string; // Иногда нужно подменить класс создаваемого контроллера в целях редактирования
     label: string;  // Русскоязычный текст с название контрола
 
     // Описание иконки. Совместимо с CSS background url. например:

@@ -17,7 +17,7 @@ export class UsefulCtrl {
         return this.descr.partition;
     }
     public getType(): string {
-        return this.descr.name;
+        return this.descr.dummyType || this.descr.name;
     }
     public getIcon(): string {
         return this.descr.icon;
